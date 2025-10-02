@@ -17,7 +17,7 @@ from typing import (
 
 from typing_extensions import ParamSpec
 
-from prefect.client.schemas.objects import State, TaskRunInput
+from prefect.client.schemas.objects import State, RunInput
 #from prefect.futures import PrefectFuture, PrefectFutureList, PrefectWrappedFuture
 from prefect.futures import PrefectFuture, PrefectWrappedFuture
 from prefect.logging.loggers import get_logger, get_run_logger
@@ -139,7 +139,7 @@ class PSIJTaskRunner(TaskRunner):
         task: "Task[P, Coroutine[Any, Any, R]]",
         parameters: dict[str, Any],
         wait_for: Iterable[PrefectPSIJFuture[R]] | None = None,
-        dependencies: dict[str, Set[TaskRunInput]] | None = None,
+        dependencies: dict[str, Set[RunInput]] | None = None,
     ) -> PrefectPSIJFuture[R]: ...
 
     @overload
@@ -148,7 +148,7 @@ class PSIJTaskRunner(TaskRunner):
         task: "Task[Any, R]",
         parameters: dict[str, Any],
         wait_for: Iterable[PrefectPSIJFuture[R]] | None = None,
-        dependencies: dict[str, Set[TaskRunInput]] | None = None,
+        dependencies: dict[str, Set[RunInput]] | None = None,
     ) -> PrefectPSIJFuture[R]: ...
 
     # Job submission function, will call executor submit_python function, create job, python execution script, serialize data, and submit the job
@@ -163,7 +163,7 @@ class PSIJTaskRunner(TaskRunner):
         task: "Task[P, R]",
         parameters: dict[str, Any],
         wait_for: Iterable[PrefectPSIJFuture[R]] | None = None,
-        dependencies: dict[str, Set[TaskRunInput]] | None = None,
+        dependencies: dict[str, Set[RunInput]] | None = None,
     ) -> PrefectPSIJFuture[R]:
 
         job = self.job_executor.submit_python( task.fn, self.job_spec, kwargs=parameters )
