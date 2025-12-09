@@ -166,10 +166,19 @@ class PSIJTaskRunner(TaskRunner):
         dependencies: dict[str, Set[RunInput]] | None = None,
     ) -> PrefectPSIJFuture[R]:
 
-        job = self.job_executor.submit_python( task.fn, self.job_spec, kwargs=parameters )
-        if not isinstance(job.spec.attributes.custom_attributes, dict):
-            job.spec.attributes.custom_attributes = {}
-        job.spec.attributes.custom_attributes['tmp_output'] = f'{self.job_executor.work_directory}/{job.id}_out.pkl'
+        if( 'python' not in self.job_spec['executable'].split('/')[-1] ):
+            job = self.job_executor.submit( self.job_spec )
+            if not isinstance(job.spec.attributes.custom_attributes, dict):
+                job.spec.attributes.custom_attributes = {}
+            job.spec.attributes.custom_attributes['tmp_output'] = f'{self.job_executor.work_directory}/{job.id}_out.pkl'
+        else:
+            if( parameters == None ):
+                job = self.job_executor.submit_python( task.fn, self.job_spec )
+            else:
+                job = self.job_executor.submit_python( task.fn, self.job_spec, kwargs=parameters )
+            if not isinstance(job.spec.attributes.custom_attributes, dict):
+                job.spec.attributes.custom_attributes = {}
+            job.spec.attributes.custom_attributes['tmp_output'] = f'{self.job_executor.work_directory}/{job.id}_out.pkl'
 
         return PrefectPSIJFuture[R]( task_run_id=job.id, wrapped_future=job )
 
